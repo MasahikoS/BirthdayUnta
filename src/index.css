@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: #fce7f3;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  font-family: system-ui, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+}
+
+.lcd-font {
+  font-family: 'DotGothic16', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'MS Gothic', monospace;
+}
+
+/* 📺 本物のモノクロ/レトロ液晶のような微細な1pxドットマトリクス網目オーバーレイ */
+.lcd-matrix-grid {
+  background-image:
+    linear-gradient(to right, rgba(35, 45, 22, 0.085) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(35, 45, 22, 0.085) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+
+@keyframes wash {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+.wash { animation: wash 1.4s steps(10) forwards; }
+
+@keyframes zzz {
+  0%, 100% { opacity: 0.2; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-4px); }
+}
+.zzz { animation: zzz 1.6s steps(4) infinite; }
+
+/* 🦋 待機小ネタ: ちょうちょが左から右へひらひら飛ぶアニメーション */
+@keyframes butterflyFly {
+  0% { transform: translate(-20px, 14px); opacity: 0; }
+  15% { opacity: 1; }
+  35% { transform: translate(60px, -6px); }
+  65% { transform: translate(135px, 10px); }
+  85% { opacity: 1; }
+  100% { transform: translate(210px, -8px); opacity: 0; }
+}
+.butterfly-fly {
+  animation: butterflyFly 3.2s steps(16) forwards;
+}
+
+/* 🐱 待機小ネタ: ころんと寝返りを打つアニメーション */
+@keyframes catRoll {
+  0% { transform: rotate(0deg) translateX(0); }
+  30% { transform: rotate(-22deg) translateX(-8px) translateY(2px); }
+  65% { transform: rotate(22deg) translateX(8px) translateY(2px); }
+  100% { transform: rotate(0deg) translateX(0); }
+}
+.cat-roll {
+  animation: catRoll 2.2s steps(6) forwards;
+}
+
+/* 💖 好物・なでなで時のぷかぷかハートアニメーション */
+@keyframes floatHeart {
+  0% { transform: translateY(4px) scale(0.8); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translateY(-18px) scale(1.1); opacity: 0; }
+}
+.float-heart {
+  animation: floatHeart 1.4s steps(6) forwards;
+}
