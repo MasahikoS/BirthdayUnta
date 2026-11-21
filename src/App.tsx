@@ -355,18 +355,6 @@ export default function App() {
                 backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 11px, ${shell.bezelLines} 11px, ${shell.bezelLines} 13px)`,
               }}
             >
-              <svg
-                viewBox="0 0 200 200"
-                className="pointer-events-none absolute inset-0 w-full h-full z-20 opacity-60"
-              >
-                <polygon
-                  points="10,25 45,15 70,4 100,15 130,4 155,15 190,25 185,175 150,185 125,196 100,185 75,196 50,185 15,175"
-                  fill="none"
-                  stroke="rgba(255,255,255,0.65)"
-                  strokeWidth="1.8"
-                />
-              </svg>
-
               {/* 四角い液晶画面（LCD） */}
               <div
                 className="lcd-font relative flex aspect-[1/1] flex-col overflow-hidden border-2 border-[#3d4a2d] text-[#2f3a22] rounded-none z-10 touch-none"
