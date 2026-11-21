@@ -185,24 +185,48 @@ export default function App() {
   const shell = SHELL_STYLES[state.shellColor || 'pink'];
   const adultInfo = getAdultVariantInfo(state.adultType);
 
-  // Bボタン長押し（約2.5秒）で隠しコマンド: お誕生日モード
-  const pressTimer = useRef<number | undefined>(undefined);
-  const longFired = useRef(false);
-  const startPress = () => {
-    longFired.current = false;
-    window.clearTimeout(pressTimer.current);
-    pressTimer.current = window.setTimeout(() => {
-      longFired.current = true;
+  // A＋Cボタン同時押しで隠しコマンド: お誕生日サプライズ演出
+  const downARef = useRef(false);
+  const downCRef = useRef(false);
+  const skipAClickRef = useRef(false);
+  const skipCClickRef = useRef(false);
+
+  const downA = () => {
+    downARef.current = true;
+    if (downCRef.current) {
+      skipAClickRef.current = true;
+      skipCClickRef.current = true;
       g.openBirthday(false);
-    }, 2500);
+    }
   };
-  const endPress = () => window.clearTimeout(pressTimer.current);
-  const clickB = () => {
-    if (longFired.current) {
-      longFired.current = false;
+  const upA = () => {
+    downARef.current = false;
+  };
+  const clickA = () => {
+    if (skipAClickRef.current) {
+      skipAClickRef.current = false;
       return;
     }
-    g.pressB();
+    g.pressA();
+  };
+
+  const downC = () => {
+    downCRef.current = true;
+    if (downARef.current) {
+      skipAClickRef.current = true;
+      skipCClickRef.current = true;
+      g.openBirthday(false);
+    }
+  };
+  const upC = () => {
+    downCRef.current = false;
+  };
+  const clickC = () => {
+    if (skipCClickRef.current) {
+      skipCClickRef.current = false;
+      return;
+    }
+    g.pressC();
   };
 
   /**
@@ -334,15 +358,8 @@ export default function App() {
           <div className="pointer-events-none absolute top-[56%] left-0 w-[14%] h-[2px] bg-gradient-to-r from-white/80 to-white/20 shadow-[0_1px_2px_rgba(0,0,0,0.4)] rotate-6 z-20" />
           <div className="pointer-events-none absolute top-[56%] right-0 w-[14%] h-[2px] bg-gradient-to-l from-white/80 to-white/20 shadow-[0_1px_2px_rgba(0,0,0,0.4)] -rotate-6 z-20" />
 
-          {/* ブランドタイトル */}
-          <div className="text-center flex flex-col items-center pt-1.5 z-20">
-            <span className="font-mono text-[13px] font-black tracking-[0.3em] text-white drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.65)]">
-              うんたねこ
-            </span>
-            <span className="text-[8.5px] font-bold text-white/95 -mt-0.5 tracking-wider drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
-              {state.stage === 'baby' ? '🐣 べび期（しんか先: ？？？）' : `${adultInfo.badge}（${adultInfo.name}）`}
-            </span>
-          </div>
+          {/* 上部スペーサー（すっきりした本体デザイン） */}
+          <div className="h-6 z-20" />
 
           {/* ======================================================== */}
           {/* 📺 クリアカット掘り込みベゼル × 四角いLCDドットマトリクス画面 */}
@@ -402,12 +419,12 @@ export default function App() {
                       {/* 🦋 待機小ネタ演出: ちょうちょ飛来 */}
                       {g.idleEvent === 'butterfly' && <FlyingButterfly />}
 
-                      <div className={`relative ${g.idleEvent === 'roll' ? 'cat-roll' : ''}`}>
+                      <div className="relative">
                         <CatSprite
                           stage={state.stage}
                           adultType={state.adultType}
                           pose={g.pose}
-                          still={state.sleeping || g.idleEvent === 'roll'}
+                          still={state.sleeping}
                         />
 
                         {/* 睡眠Zzzマーク */}
@@ -512,15 +529,14 @@ export default function App() {
                   {screen === 'status' && (
                     <div className="flex h-full flex-col justify-between p-1.5 text-xs font-bold overflow-hidden">
                       <div className="flex items-center justify-between border-b border-[#2f3a22]/30 pb-0.5 text-[9.5px] leading-tight">
-                        <span>📊 {state.generation ?? 1}代目 メーター</span>
+                        <span>★ {state.generation ?? 1}代目 メーター</span>
                         <span>
                           図鑑:{' '}
                           {ADULT_VARIANTS.map((v) => {
                             const unlocked =
                               (state.unlockedAdults ?? []).includes(v.id) ||
                               (state.stage === 'adult' && state.adultType === v.id);
-                            const icon = v.id === 'adult_a' ? '🐱' : v.id === 'adult_b' ? '🍙' : '🤨';
-                            return unlocked ? icon : '❓';
+                            return unlocked ? '●' : '○';
                           }).join('')}
                         </span>
                       </div>
@@ -539,7 +555,7 @@ export default function App() {
                         </div>
                         <div className="flex justify-between items-center pt-0.5 border-t border-[#2f3a22]/20">
                           <span>すがた ({g.age}日目)</span>
-                          <span>{state.stage === 'baby' ? '👶 べびうんた' : adultInfo.name}</span>
+                          <span>{state.stage === 'baby' ? 'べびうんた' : adultInfo.name}</span>
                         </div>
                         {state.stage === 'baby' ? (
                           <div className="flex justify-between items-center">
@@ -550,13 +566,21 @@ export default function App() {
                           <button
                             type="button"
                             onClick={() => g.welcomeNextEgg()}
-                            className="w-full mt-0.5 py-0.5 px-1 bg-[#2f3a22] text-[var(--lcd)] text-[9.5px] font-black text-center animate-pulse cursor-pointer active:scale-95"
+                            className="w-full mt-0.5 py-0.5 px-1 bg-[#2f3a22] text-[var(--lcd)] text-[9.5px] font-black flex items-center justify-center gap-1 animate-pulse cursor-pointer active:scale-95"
                           >
-                            🥚 新しいタマゴをむかえる ({(state.generation ?? 1) + 1}代目へ)
+                            <img
+                              src="./characters/egg.png"
+                              alt="たまご"
+                              className="w-3.5 h-3.5 object-contain bg-[var(--lcd)] rounded-xs p-[1px]"
+                            />
+                            <span>新しいタマゴをむかえる ({(state.generation ?? 1) + 1}代目へ)</span>
                           </button>
                         ) : (
                           <div className="flex justify-between items-center">
-                            <span>🥚 次のタマゴ解禁まで</span>
+                            <span className="flex items-center gap-1">
+                              <img src="./characters/egg.png" alt="たまご" className="w-3.5 h-3.5 object-contain" />
+                              <span>次のタマゴ解禁まで</span>
+                            </span>
                             <span>あと {g.nextEggRemaining} pt</span>
                           </div>
                         )}
@@ -581,42 +605,50 @@ export default function App() {
                           </div>
                           <div className="flex items-center gap-2 mt-1">
                             <CatSprite stage="baby" pose="surprised" size={5.5} />
-                            <span className="text-lg font-black animate-bounce">➔ ❓</span>
+                            <span className="text-lg font-black animate-bounce">➔ ？</span>
                           </div>
                         </>
                       ) : (
                         <>
                           <div className="text-[11px] font-black animate-bounce">
-                            🎉 {adultInfo.name} に進化！！ 🎉
+                            ★ {adultInfo.name} に進化！！ ★
                           </div>
                           <div className="scale-105 my-0.5">
                             <CatSprite stage="adult" adultType={state.adultType} pose="love" size={6} />
                           </div>
-                          <div className="text-[9px] font-bold opacity-85">{adultInfo.badge}</div>
+                          <div className="text-[9px] font-bold opacity-85">{adultInfo.name}</div>
                         </>
                       )}
                     </div>
                   )}
 
-                  {/* 🥚 新しいタマゴ（世代交代）誕生演出画面 */}
+                  {/* 新しいタマゴ（世代交代）誕生演出画面 */}
                   {screen === 'new_egg' && (
                     <div className="flex h-full flex-col items-center justify-center gap-1.5 p-2 text-center">
                       {!g.eggHatched ? (
                         <>
                           <div className="text-[10px] font-black leading-tight">
-                            💕 いっぱいかわいがってくれて
+                            ♥ いっぱいかわいがってくれて
                             <br />
                             ありがとうにゃ！！
                           </div>
-                          <div className="flex items-center gap-2 my-1">
-                            <CatSprite stage="adult" adultType={state.adultType} pose="love" size={5.2} />
-                            <span className="text-base font-black animate-bounce">➔ 🥚✨</span>
+                          <div className="flex items-end justify-center gap-3 my-1">
+                            <div className="translate-y-1">
+                              <CatSprite stage="adult" adultType={state.adultType} pose="love" size={5.2} still />
+                            </div>
+                            <span className="text-sm font-black pb-3">➔</span>
+                            <img
+                              src="./characters/egg.png"
+                              alt="たまご"
+                              className="w-12 h-12 object-contain"
+                              style={{ imageRendering: 'pixelated' }}
+                            />
                           </div>
                         </>
                       ) : (
                         <>
                           <div className="text-[10.5px] font-black animate-bounce">
-                            🐣 {state.generation ?? 2}代目の べびうんた 誕生！ 🐣
+                            ★ {state.generation ?? 2}代目の べびうんた 誕生！ ★
                           </div>
                           <div className="scale-105 my-0.5">
                             <CatSprite stage="baby" pose="happy" size={5.8} />
@@ -663,7 +695,12 @@ export default function App() {
             <div className="flex flex-col items-center -translate-y-2">
               <div className="w-12 h-12 rounded-full p-1 bg-black/30 border border-white/45 shadow-[inset_0_3px_5px_rgba(0,0,0,0.75),0_1px_2px_rgba(255,255,255,0.5)] flex items-center justify-center">
                 <button
-                  onClick={g.pressA}
+                  onClick={clickA}
+                  onPointerDown={downA}
+                  onPointerUp={upA}
+                  onPointerLeave={upA}
+                  onPointerCancel={upA}
+                  onContextMenu={(e) => e.preventDefault()}
                   className="w-10 h-10 rounded-full shadow-[0_3px_0_#92400e,0_4px_6px_rgba(0,0,0,0.35)] transition-all active:translate-y-0.5 active:shadow-[0_1px_0_#92400e] flex items-center justify-center font-black text-amber-950 text-xs border border-yellow-100 cursor-pointer"
                   style={{
                     backgroundImage: 'radial-gradient(circle at 38% 28%, #fef9c3 0%, #facc15 55%, #d97706 100%)',
@@ -681,12 +718,7 @@ export default function App() {
             <div className="flex flex-col items-center translate-y-1.5">
               <div className="w-13 h-13 rounded-full p-1 bg-black/30 border border-white/45 shadow-[inset_0_3px_5px_rgba(0,0,0,0.75),0_1px_2px_rgba(255,255,255,0.5)] flex items-center justify-center">
                 <button
-                  onClick={clickB}
-                  onPointerDown={startPress}
-                  onPointerUp={endPress}
-                  onPointerLeave={endPress}
-                  onPointerCancel={endPress}
-                  onContextMenu={(e) => e.preventDefault()}
+                  onClick={g.pressB}
                   className="w-11 h-11 rounded-full shadow-[0_3px_0_#92400e,0_4px_6px_rgba(0,0,0,0.35)] transition-all active:translate-y-0.5 active:shadow-[0_1px_0_#92400e] flex items-center justify-center font-black text-amber-950 text-sm border border-yellow-100 cursor-pointer"
                   style={{
                     backgroundImage: 'radial-gradient(circle at 38% 28%, #fef9c3 0%, #facc15 55%, #d97706 100%)',
@@ -704,7 +736,12 @@ export default function App() {
             <div className="flex flex-col items-center -translate-y-2">
               <div className="w-12 h-12 rounded-full p-1 bg-black/30 border border-white/45 shadow-[inset_0_3px_5px_rgba(0,0,0,0.75),0_1px_2px_rgba(255,255,255,0.5)] flex items-center justify-center">
                 <button
-                  onClick={g.pressC}
+                  onClick={clickC}
+                  onPointerDown={downC}
+                  onPointerUp={upC}
+                  onPointerLeave={upC}
+                  onPointerCancel={upC}
+                  onContextMenu={(e) => e.preventDefault()}
                   className="w-10 h-10 rounded-full shadow-[0_3px_0_#92400e,0_4px_6px_rgba(0,0,0,0.35)] transition-all active:translate-y-0.5 active:shadow-[0_1px_0_#92400e] flex items-center justify-center font-black text-amber-950 text-xs border border-yellow-100 cursor-pointer"
                   style={{
                     backgroundImage: 'radial-gradient(circle at 38% 28%, #fef9c3 0%, #facc15 55%, #d97706 100%)',
@@ -719,11 +756,6 @@ export default function App() {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* 下部の案内文（卵の外側） */}
-      <div className="text-center text-[10px] text-stone-500 font-mono tracking-tight font-medium">
-        ※ Bボタン長押し(2.5秒)で誕生日サプライズ演出！
       </div>
 
       {/* お誕生日サプライズオーバーレイ */}

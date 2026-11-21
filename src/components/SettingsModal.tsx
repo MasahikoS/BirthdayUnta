@@ -35,10 +35,9 @@ const DIALOGUE_CATEGORIES: { key: DialogueKey; label: string; desc: string }[] =
   { key: 'tapNight', label: 'よるタップ時', desc: '夜（17時〜22時）にタップしたとき' },
   { key: 'tapMidnight', label: 'しんやタップ時', desc: '深夜（22時〜5時）にタップしたとき' },
   { key: 'babyTap', label: 'べび期タップ時', desc: '赤ちゃん期にタップしたとき' },
-  { key: 'meal', label: 'ごはん（おにぎり）後', desc: '通常のごはんを食べたあと' },
-  { key: 'favoriteMeal', label: '★好物（お寿司）後', desc: '好物のお寿司を食べたあと' },
-  { key: 'snack', label: 'おやつ（プリン）後', desc: '通常のおやつを食べたあと' },
-  { key: 'favoriteSnack', label: '★好物（ケーキ）後', desc: '好物のケーキを食べたあと' },
+  { key: 'meal', label: 'ごはん（おにぎり・お寿司）後', desc: '通常のごはんを食べたあと' },
+  { key: 'favoriteMeal', label: '★大好物（プリン）後', desc: '大好物のプリンを食べたあと' },
+  { key: 'snack', label: 'おやつ（ショートケーキ）後', desc: '通常のおやつを食べたあと' },
   { key: 'sick', label: 'びょうき時', desc: 'しょんぼり・びょうき中のセリフ' },
   { key: 'cure', label: 'おくすり回復時', desc: 'おくすりで元気になったとき' },
   { key: 'calling', label: 'かまって呼び出し時', desc: 'わがまま呼び出しベルが鳴ったとき' },
@@ -46,6 +45,8 @@ const DIALOGUE_CATEGORIES: { key: DialogueKey; label: string; desc: string }[] =
   { key: 'gameWin', label: 'ゲーム勝利時', desc: 'ミニゲームで勝ったとき' },
   { key: 'birthdayTap', label: '誕生日お祝い時', desc: 'お誕生日モード中のセリフ' },
 ];
+
+const IS_DEV = import.meta.env.DEV;
 
 export function SettingsModal({
   state,
@@ -59,7 +60,7 @@ export function SettingsModal({
 }: Props) {
   const [activeTab, setActiveTab] = useState<'general' | 'character' | 'dialogues'>('general');
   const [name, setName] = useState(state.partnerName);
-  const [date, setDate] = useState(state.birthday ? `2000-${state.birthday}` : '');
+  const [date, setDate] = useState(state.birthday ? `2003-${state.birthday}` : '');
   const [soundOn, setSoundOn] = useState(state.soundOn);
   const [hapticOn, setHapticOn] = useState(state.hapticOn ?? true);
   const [stage, setStage] = useState<GrowthStage>(state.stage);
@@ -119,46 +120,48 @@ export function SettingsModal({
             </button>
           </div>
 
-          {/* タブ切り替え（基本設定 / キャラ画像メーカー / セリフ編集） */}
-          <div className="flex border-b border-gray-200 mb-3">
-            <button
-              onClick={() => setActiveTab('general')}
-              className={`flex-1 pb-2 text-[11px] font-bold transition border-b-2 flex items-center justify-center gap-1 cursor-pointer ${
-                activeTab === 'general'
-                  ? 'border-pink-500 text-pink-600'
-                  : 'border-transparent text-gray-400 hover:text-gray-600'
-              }`}
-            >
-              <span>🛠️ 基本設定</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('character')}
-              className={`flex-1 pb-2 text-[11px] font-bold transition border-b-2 flex items-center justify-center gap-1 cursor-pointer ${
-                activeTab === 'character'
-                  ? 'border-pink-500 text-pink-600'
-                  : 'border-transparent text-gray-400 hover:text-gray-600'
-              }`}
-            >
-              <ImagePlus size={13} />
-              <span>🎨 キャラ画像</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('dialogues')}
-              className={`flex-1 pb-2 text-[11px] font-bold transition border-b-2 flex items-center justify-center gap-1 cursor-pointer ${
-                activeTab === 'dialogues'
-                  ? 'border-pink-500 text-pink-600'
-                  : 'border-transparent text-gray-400 hover:text-gray-600'
-              }`}
-            >
-              <MessageSquare size={13} />
-              <span>💬 セリフ編集</span>
-            </button>
-          </div>
+          {/* タブ切り替え（ローカル開発時のみキャラ画像・セリフ編集タブを表示） */}
+          {IS_DEV && (
+            <div className="flex border-b border-gray-200 mb-3">
+              <button
+                onClick={() => setActiveTab('general')}
+                className={`flex-1 pb-2 text-[11px] font-bold transition border-b-2 flex items-center justify-center gap-1 cursor-pointer ${
+                  activeTab === 'general'
+                    ? 'border-pink-500 text-pink-600'
+                    : 'border-transparent text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                <span>🛠️ 基本設定</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('character')}
+                className={`flex-1 pb-2 text-[11px] font-bold transition border-b-2 flex items-center justify-center gap-1 cursor-pointer ${
+                  activeTab === 'character'
+                    ? 'border-pink-500 text-pink-600'
+                    : 'border-transparent text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                <ImagePlus size={13} />
+                <span>🎨 キャラ画像</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('dialogues')}
+                className={`flex-1 pb-2 text-[11px] font-bold transition border-b-2 flex items-center justify-center gap-1 cursor-pointer ${
+                  activeTab === 'dialogues'
+                    ? 'border-pink-500 text-pink-600'
+                    : 'border-transparent text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                <MessageSquare size={13} />
+                <span>💬 セリフ編集</span>
+              </button>
+            </div>
+          )}
 
           {/* ======================================================== */}
-          {/* タブ2: 🎨 キャラ画像メーカー（背景くり抜き＆ドット変換） */}
+          {/* タブ2: 🎨 キャラ画像メーカー（ローカル開発時のみ） */}
           {/* ======================================================== */}
-          {activeTab === 'character' && <CharacterStudio />}
+          {IS_DEV && activeTab === 'character' && <CharacterStudio />}
 
           {/* ======================================================== */}
           {/* タブ1: 基本設定 */}
@@ -214,8 +217,9 @@ export function SettingsModal({
                 </div>
               </div>
 
-              {/* 🐱 キャラクター進化＆イベントテスト */}
-              <div className="p-2.5 bg-pink-50 rounded-2xl border border-pink-200 space-y-2">
+              {/* 🐱 キャラクター進化＆イベントテスト（ローカル開発時のみ表示） */}
+              {IS_DEV && (
+                <div className="p-2.5 bg-pink-50 rounded-2xl border border-pink-200 space-y-2">
                 <label className="flex items-center justify-between text-xs font-semibold text-pink-700">
                   <span className="flex items-center gap-1">
                     <Sparkles size={14} />
@@ -298,7 +302,8 @@ export function SettingsModal({
                     🔔 わがまま呼び出し
                   </button>
                 </div>
-              </div>
+                </div>
+              )}
 
               {/* サウンド＆触覚振動（Haptic）スイッチ */}
               <div className="flex flex-col gap-2 pt-1">
@@ -327,16 +332,18 @@ export function SettingsModal({
                 </label>
               </div>
 
-              {/* 誕生日プレビュー */}
-              <button
-                onClick={() => {
-                  save();
-                  onPreview();
-                }}
-                className="w-full rounded-xl bg-pink-100 hover:bg-pink-200 py-2 text-xs font-bold text-pink-700 transition active:scale-95"
-              >
-                🎉 お誕生日演出をプレビュー
-              </button>
+              {/* 誕生日プレビュー（ローカル開発時のみ） */}
+              {IS_DEV && (
+                <button
+                  onClick={() => {
+                    save();
+                    onPreview();
+                  }}
+                  className="w-full rounded-xl bg-pink-100 hover:bg-pink-200 py-2 text-xs font-bold text-pink-700 transition active:scale-95"
+                >
+                  🎉 お誕生日演出をプレビュー
+                </button>
+              )}
 
               {/* リセット */}
               <button
@@ -354,9 +361,9 @@ export function SettingsModal({
           )}
 
           {/* ======================================================== */}
-          {/* タブ2: 💬 セリフ編集エディタ */}
+          {/* タブ2: 💬 セリフ編集エディタ（ローカル開発時のみ） */}
           {/* ======================================================== */}
-          {activeTab === 'dialogues' && (
+          {IS_DEV && activeTab === 'dialogues' && (
             <div className="space-y-3">
               <div className="text-[11px] text-gray-500 leading-snug bg-pink-50 p-2 rounded-xl border border-pink-100">
                 💡 <b>1行につき1つのセリフ</b> を入力してください。その中からランダムで表示されます！

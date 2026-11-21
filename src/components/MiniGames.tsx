@@ -25,14 +25,14 @@ interface MiniGamesProps {
 }
 
 const MENU_ITEMS: { id: Exclude<MiniGameType, 'menu'>; title: string }[] = [
-  { id: 'hoi', title: '👆 あっちむいてホイ' },
-  { id: 'catch', title: '🐟 おやつキャッチ' },
-  { id: 'box', title: '🎁 プレゼントハコあて' },
-  { id: 'taiko', title: '🥁 たいこのたつじん' },
-  { id: 'scratch', title: '🫧 あわあわシャンプー' },
-  { id: 'memory', title: '🃏 うんた神経衰弱' },
-  { id: 'fishing', title: '🎣 大物マグロ一本釣り' },
-  { id: 'whack', title: '🐾 ひょっこりタッチ' },
+  { id: 'hoi', title: 'あっちむいてホイ' },
+  { id: 'catch', title: 'おやつキャッチ' },
+  { id: 'box', title: 'プレゼントハコあて' },
+  { id: 'taiko', title: 'たいこのたつじん' },
+  { id: 'scratch', title: 'あわあわシャンプー' },
+  { id: 'memory', title: 'うんた神経衰弱' },
+  { id: 'fishing', title: '大物マグロ一本釣り' },
+  { id: 'whack', title: 'ひょっこりタッチ' },
 ];
 
 const PAGE_SIZE = 4;
@@ -716,11 +716,11 @@ export const MiniGames: React.FC<MiniGamesProps> = ({
         </div>
       )}
 
-      {/* 3. 🫧 あわあわシャンプー */}
+      {/* 3. あわあわシャンプー */}
       {gameMode === 'scratch' && (
         <div className="flex h-full flex-col justify-between touch-none select-none">
           <div className="flex justify-between text-[9.5px] font-bold border-b border-[#2f3a22]/30 pb-0.5 leading-tight">
-            <span>🫧 指でこすって泡を落とそう</span>
+            <span>指でこすって泡を落とそう</span>
             <span>ピカピカ: {scratchCleanPct}%</span>
           </div>
 
@@ -734,7 +734,7 @@ export const MiniGames: React.FC<MiniGamesProps> = ({
                 size={5.5}
               />
               {scratchDone && (
-                <span className="text-[10px] font-black mt-0.5 animate-bounce">✨ ピカピカにゃ〜♪ ✨</span>
+                <span className="text-[10px] font-black mt-0.5 animate-bounce">★ ピカピカにゃ〜♪ ★</span>
               )}
             </div>
 
@@ -784,11 +784,11 @@ export const MiniGames: React.FC<MiniGamesProps> = ({
         </div>
       )}
 
-      {/* 4. 🃏 うんた神経衰弱 */}
+      {/* 4. うんた神経衰弱 */}
       {gameMode === 'memory' && (
         <div className="flex h-full flex-col justify-between">
           <div className="text-center text-[9.5px] font-bold border-b border-[#2f3a22]/30 pb-0.5 leading-tight">
-            🃏 同じうんたねこを揃えよう！
+            ★ 同じうんたねこを揃えよう！ ★
           </div>
 
           <div className="grid grid-cols-4 gap-1 my-auto py-1">
@@ -826,12 +826,12 @@ export const MiniGames: React.FC<MiniGamesProps> = ({
         </div>
       )}
 
-      {/* 5. 🎣 大物マグロ一本釣り */}
+      {/* 5. 大物マグロ一本釣り */}
       {gameMode === 'fishing' && (
         <div className="flex h-full flex-col justify-between">
           <div className="flex justify-between text-[9.5px] font-bold border-b border-[#2f3a22]/30 pb-0.5 leading-tight">
-            <span>🎣 マグロ一本釣り</span>
-            <span>{fishAngry ? '💢 暴れ中! はなして!' : '✨ いまだ! 長押し!'}</span>
+            <span>マグロ一本釣り</span>
+            <span>{fishAngry ? '！暴れ中! はなして!' : '★いまだ! 長押し!'}</span>
           </div>
 
           <div className="flex flex-col gap-1.5 my-auto px-1">
@@ -842,7 +842,7 @@ export const MiniGames: React.FC<MiniGamesProps> = ({
                 pose={fishAngry ? 'angry' : 'happy'}
                 size={4}
               />
-              <span className="text-xs font-black">〜〜🎣〜〜</span>
+              <span className="text-xs font-black">〜〜〜♪〜〜〜</span>
               <div className={fishAngry ? 'animate-bounce scale-125' : ''}>
                 <PixelSprite rows={SUSHI_ITEM} size={4.5} />
               </div>
@@ -884,16 +884,16 @@ export const MiniGames: React.FC<MiniGamesProps> = ({
               fishReeling ? 'bg-[#2f3a22] text-[var(--lcd)] scale-98' : 'bg-[var(--lcd)] text-[#2f3a22]'
             }`}
           >
-            {fishReeling ? '🔄 グイグイ巻き上げ中…！！' : '👇 ここを長押しでリールを巻く！'}
+            {fishReeling ? '▲ グイグイ巻き上げ中…！！' : '● ここを長押しでリールを巻く！'}
           </button>
         </div>
       )}
 
-      {/* 6. 🐾 ひょっこりうんたタッチ */}
+      {/* 6. ひょっこりうんたタッチ */}
       {gameMode === 'whack' && (
         <div className="flex h-full flex-col justify-between">
           <div className="flex justify-between text-[9.5px] font-bold border-b border-[#2f3a22]/30 pb-0.5 leading-tight">
-            <span>🐾 うんたをタッチ！(💩注意)</span>
+            <span>うんたをタッチ！(ウンチ注意)</span>
             <span>
               {whackScore}/5点 ({whackTime}秒)
             </span>
@@ -911,7 +911,7 @@ export const MiniGames: React.FC<MiniGamesProps> = ({
                   <CatSprite stage={stage} adultType={adultType} pose="happy" size={2.5} still />
                 )}
                 {slot === 'poop' && <PixelSprite rows={POOP} size={2.8} />}
-                {slot === 'empty' && <span className="text-[8px] opacity-30">🕳️</span>}
+                {slot === 'empty' && <span className="text-[8px] opacity-30">○</span>}
               </button>
             ))}
           </div>
@@ -938,7 +938,7 @@ export const MiniGames: React.FC<MiniGamesProps> = ({
             />
             <div className="h-4 text-[10px] font-black mt-0.5">
               {hoiPhase === 'reveal' && (hoiCatDir === hoiPick ? 'あたり！' : 'はずれ…')}
-              {hoiPhase === 'result' && (hoiWins >= 2 ? '🎉 かち！' : '😢 まけ…')}
+              {hoiPhase === 'result' && (hoiWins >= 2 ? '★ かち！ ★' : '× まけ…')}
             </div>
           </div>
           {hoiPhase === 'choose' && (
@@ -1032,7 +1032,7 @@ export const MiniGames: React.FC<MiniGamesProps> = ({
             {boxPhase === 'intro' && '★ アタリをよくみててね！ ★'}
             {boxPhase === 'shuffle' && 'くるくる… シャッフル中！'}
             {boxPhase === 'pick' && 'どれにする？ [A:選択 / B:決定]'}
-            {boxPhase === 'reveal' && (boxSelected === boxWinning ? '🎉 あたりーー！！' : '😢 はずれ〜')}
+            {boxPhase === 'reveal' && (boxSelected === boxWinning ? '★ あたりーー！！ ★' : '× はずれ〜')}
           </div>
 
           <div className="flex justify-around items-end my-auto py-1">

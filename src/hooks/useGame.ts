@@ -37,13 +37,13 @@ export interface FoodOption {
 
 export const FOOD_MENU: readonly FoodOption[] = [
   { id: 'onigiri', name: 'おにぎり', desc: 'おなか+1', kind: 'meal', favorite: false },
-  { id: 'sushi', name: 'とくじょう寿司★', desc: '好物!おなか+2', kind: 'meal', favorite: true },
-  { id: 'pudding', name: 'プリン', desc: 'ごきげん+1', kind: 'snack', favorite: false },
-  { id: 'cake', name: 'ショートケーキ★', desc: '好物!ごきげん+2', kind: 'snack', favorite: true },
+  { id: 'sushi', name: 'とくじょう寿司', desc: 'おなか+2', kind: 'meal', favorite: false },
+  { id: 'pudding', name: 'プリン★', desc: '好物!ごきげん+2', kind: 'snack', favorite: true },
+  { id: 'cake', name: 'ショートケーキ', desc: 'ごきげん+1', kind: 'snack', favorite: false },
 ];
 
 export type Anim = 'eat' | 'eatFavorite' | 'clean' | 'cure' | 'stroke' | null;
-export type IdleEvent = 'butterfly' | 'yawn' | 'roll' | null;
+export type IdleEvent = 'butterfly' | 'yawn' | null;
 
 export function useGame() {
   const [state, setState] = useState<GameState>(() => {
@@ -70,8 +70,8 @@ export function useGame() {
   const idleTimer = useRef<number | undefined>(undefined);
   const lastInteract = useRef(Date.now());
   const latest = useRef<{ checkBirthday: () => void; chatterAndIdle: () => void }>({
-    checkBirthday: () => {},
-    chatterAndIdle: () => {},
+    checkBirthday: () => { },
+    chatterAndIdle: () => { },
   });
 
   const vars = { name: state.partnerName || 'きみ' };
@@ -125,6 +125,7 @@ export function useGame() {
   };
 
   const say = (text: string, ms = 3500) => {
+    if (!text) return;
     setBubble(text);
     window.clearTimeout(bubbleTimer.current);
     bubbleTimer.current = window.setTimeout(() => setBubble(null), ms);
@@ -163,7 +164,7 @@ export function useGame() {
       setScreen('main');
       setEvolveReveal(false);
       flashPose('love', 2600);
-      say(`✨ ${info.name} にしんかしたにゃ！`, 4500);
+      say(`★ ${info.name} にしんかしちゃあよ！`, 4500);
     }, 3200);
   };
 
@@ -203,7 +204,7 @@ export function useGame() {
       setScreen('main');
       setEggHatched(false);
       flashPose('happy', 2600);
-      say(`🐣 ${nextGen}代目の べびうんた が生まれたにゃ！`, 4500);
+      say(`★ ${nextGen}代目の べびうんた が生まれちゃ！`, 4500);
     }, 3400);
   };
 
@@ -217,7 +218,7 @@ export function useGame() {
     if (!prevReady && nextReady) {
       setTimeout(() => {
         sounds.favorite(stateRef.current.soundOn);
-        say('🥚 メーター画面から「つぎのタマゴ」を迎えられるにゃ✨', 4800);
+        say('★ メーター画面から「つぎのタマゴ」を迎えられりゅよ！', 4800);
       }, 1900);
     }
   };
@@ -252,7 +253,7 @@ export function useGame() {
 
   // ---- 待機中のランダム小ネタ演出 ＆ ひとりごと ----
   const triggerRandomIdleEvent = () => {
-    const events: ('butterfly' | 'yawn' | 'roll')[] = ['butterfly', 'yawn', 'roll'];
+    const events: ('butterfly' | 'yawn')[] = ['butterfly', 'yawn'];
     const picked = events[Math.floor(Math.random() * events.length)];
     setIdleEvent(picked);
 
@@ -265,20 +266,13 @@ export function useGame() {
         setTmpPose(null);
         setIdleEvent(null);
       }, 3400);
-    } else if (picked === 'yawn') {
+    } else {
       say(pickRandom('idleYawn', vars), 3000);
       setTmpPose('yawn');
       idleTimer.current = window.setTimeout(() => {
         setTmpPose(null);
         setIdleEvent(null);
       }, 2800);
-    } else {
-      say(pickRandom('idleRoll', vars), 2800);
-      setTmpPose('happy');
-      idleTimer.current = window.setTimeout(() => {
-        setTmpPose(null);
-        setIdleEvent(null);
-      }, 2400);
     }
   };
 
@@ -337,12 +331,12 @@ export function useGame() {
       if (s.hunger >= MAX_LEVEL) {
         sounds.lose(snd);
         setScreen('main');
-        say('もうおなかいっぱいにゃ…');
+        say('もうたべりぇない...');
         return;
       }
-      const addHunger = opt.favorite ? 2 : 1;
+      const addHunger = opt.id === 'sushi' || opt.favorite ? 2 : 1;
       const addHappy = opt.favorite ? 1 : 0;
-      const addCare = opt.favorite ? 2 : 1;
+      const addCare = opt.id === 'sushi' || opt.favorite ? 2 : 1;
       const nextCare = s.careCount + addCare;
       patch((p) => ({
         hunger: Math.min(MAX_LEVEL, p.hunger + addHunger),
@@ -356,7 +350,7 @@ export function useGame() {
       if (s.hunger >= MAX_LEVEL && s.happy >= MAX_LEVEL) {
         sounds.lose(snd);
         setScreen('main');
-        say('いまはおやつ いいにゃ');
+        say('もうムリ...がんばりぇない...');
         return;
       }
       const addHappy = opt.favorite ? 2 : 1;
@@ -367,7 +361,7 @@ export function useGame() {
         happyAcc: 0,
         careCount: nextCare,
       }));
-      say(pickRandom(opt.favorite ? 'favoriteSnack' : 'snack', vars));
+      say(pickRandom(opt.favorite ? 'favoriteMeal' : 'snack', vars));
       checkAutoEvolution({ ...s, careCount: nextCare });
     }
 
@@ -390,7 +384,7 @@ export function useGame() {
     if (!s.sick) {
       sounds.select(snd);
       flashPose('happy', 1000);
-      say('いまは げんきいっぱいにゃ♪');
+      say('今日調子が悪いだけだもん！！');
       return;
     }
     sounds.cure(snd);
@@ -434,14 +428,14 @@ export function useGame() {
       }));
       setAnim(null);
       flashPose(wasCalling ? 'love' : 'happy', 1800);
-      say(pickRandom(wasCalling ? 'strokeGood' : 'strokeNormal', vars));
+      say(pickRandom('strokeGood', vars));
       checkAutoEvolution({ ...stateRef.current, careCount: nextCare });
     }, 1300);
   };
 
   const doClean = () => {
     if (stateRef.current.poop === 0) {
-      say('まだきれいだにゃ！');
+      say('まだくちゃくない！');
       return;
     }
     sounds.clean(snd);
