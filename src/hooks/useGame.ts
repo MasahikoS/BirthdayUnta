@@ -240,6 +240,8 @@ export function useGame() {
 
   const closeBirthday = () => {
     setBirthdayOpen(false);
+    setBirthdayMode(false);
+    flashPose('love', 2200);
     say(pickRandom('birthdayTap', vars), 4000);
   };
 
